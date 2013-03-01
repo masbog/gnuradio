@@ -69,6 +69,8 @@
  *  GR_LOG_FATAL
  */
 
+typedef log4cxx::LoggerPtr gr_logger_ptr;
+
 #define GR_CONFIG_LOGGER(config)	\
   logger_load_config(config)
 
@@ -353,6 +355,9 @@ class gr_log
 
 //If ENABLE_GR_LOG not set then clear all logging macros
 #else
+
+typedef void* gr_logger_ptr;
+
 #define GR_CONFIG_LOGGER(config)
 #define GR_LOG_GETLOGGER(logger, name) 
 #define GR_SET_LEVEL(logger, level)

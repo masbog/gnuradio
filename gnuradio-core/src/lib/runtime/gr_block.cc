@@ -29,6 +29,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <gr_block_registry.h>
+#include <gr_prefs.h>
 
 gr_block::gr_block (const std::string &name,
                     gr_io_signature_sptr input_signature,
@@ -49,6 +50,24 @@ gr_block::gr_block (const std::string &name,
     d_min_output_buffer(std::max(output_signature->max_streams(),1), -1)
 {
     global_block_registry.register_primitive(alias(), this);
+
+#ifdef ENABLE_GR_LOG
+    gr_prefs *p = gr_prefs::singleton();
+    std::string log_file = p->get_string("LOG", "log_config", "");
+    std::string log_level = p->get_string("LOG", "log_level", "off");
+    std::string debug_level = p->get_string("LOG", "debug_level", "off");
+    GR_CONFIG_LOGGER(log_file);
+    GR_LOG_GETLOGGER(LOG, "gr_log." + alias());
+    GR_LOG_SET_LEVEL(LOG, log_level);
+    d_logger = LOG;
+
+    GR_LOG_GETLOGGER(DLOG, "gr_log_debug." + alias());
+    GR_LOG_SET_LEVEL(DLOG, debug_level);
+    d_debug_logger = DLOG;
+#else
+    d_logger = NULL;
+    d_debug_logger = NULL;
+#endif /* ENABLE_GR_LOG */
 }
 
 gr_block::~gr_block ()
